@@ -97,7 +97,7 @@ export function Transactions({ summary, transactions, categories, run }: Props) 
       </form>
 
       {transactions.length === 0 ? (
-        <Empty>Nothing recorded this month yet.</Empty>
+        <Empty>Nothing here yet this month.</Empty>
       ) : (
         <div className="table-wrap">
           <table>

@@ -35,9 +35,7 @@ export function Budgets({ summary, run }: { summary: Summary; run: Run }) {
 
   return (
     <Panel title="Budgets">
-      {expense.length === 0 && (
-        <Empty>Add a category and a monthly budget to start tracking.</Empty>
-      )}
+      {expense.length === 0 && <Empty>Add your first category and give it a monthly budget.</Empty>}
       <ul className="rows">
         {expense.map((category) => {
           const used = percent(category.totalCents, category.budgetCents);

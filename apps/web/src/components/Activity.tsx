@@ -16,7 +16,9 @@ export function Activity({ alerts, digests, currency }: Props) {
 
   return (
     <Panel title="Activity">
-      {items.length === 0 && <Empty>Budget alerts and your daily digest appear here.</Empty>}
+      {items.length === 0 && (
+        <Empty>Budget alerts and your morning digest will show up here.</Empty>
+      )}
       <ul className="rows">
         {items.map(({ alert, digest }) =>
           alert ? (

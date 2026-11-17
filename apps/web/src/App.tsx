@@ -111,7 +111,7 @@ export function App() {
         if (stale) return;
         if (error instanceof ApiError && error.status === 401) {
           setLocked(true);
-          setLoadError(tokenStore.get() ? 'That token was not accepted.' : null);
+          setLoadError(tokenStore.get() ? "That token didn't work. Try again." : null);
         } else {
           setLoadError(error instanceof Error ? error.message : 'Could not reach the server');
         }
@@ -156,8 +156,7 @@ export function App() {
     void run(async () => {
       const result = await api.runAutomation();
       if (result.skipped) toast('info', 'Automation is already running');
-      else if (!result.posted && !result.digestCreated)
-        toast('info', 'Everything is already up to date');
+      else if (!result.posted && !result.digestCreated) toast('info', "You're all caught up");
     });
 
   const shown = data?.summary.month ?? null;
@@ -278,9 +277,7 @@ function TokenGate({ onSubmit }: { onSubmit: () => void }) {
   return (
     <form className="panel gate" onSubmit={submit}>
       <h2>Enter your API token</h2>
-      <p className="muted">
-        This server is protected. Use the API_TOKEN value from its configuration.
-      </p>
+      <p className="muted">This one's locked. Paste the API_TOKEN from your .env file to get in.</p>
       <input
         type="password"
         aria-label="API token"

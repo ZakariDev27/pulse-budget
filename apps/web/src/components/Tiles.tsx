@@ -27,8 +27,8 @@ export function Tiles({ summary }: { summary: Summary }) {
             <p className="figure figure-muted">—</p>
             <p className="note">
               {totals.budgetCents > 0
-                ? 'Shown for the current month.'
-                : 'Give a category a monthly budget to see this.'}
+                ? 'Only shown for the current month.'
+                : 'Set a monthly budget on a category and this lights up.'}
             </p>
           </>
         )}
