@@ -160,7 +160,7 @@ scripts       Demo data seeder
 
 ### Continuous integration
 
-Every push and pull request gets linted, typechecked, tested against PostgreSQL and built. Then CI builds all the containers, boots the whole stack and pokes at it through the web container to make sure it really works. Pushes to `main` and version tags publish images to GitHub Container Registry, and Dependabot keeps packages, base images and actions up to date.
+Every push and pull request gets linted, typechecked, tested against PostgreSQL and built. Then CI builds all the containers, boots the whole stack and pokes at it through the web container to make sure it really works. Pushes to `main` and version tags publish images to GitHub Container Registry.
 
 ## License
 
