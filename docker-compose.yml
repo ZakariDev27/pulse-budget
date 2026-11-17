@@ -1,0 +1,79 @@
+name: pulse-budget
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: apps/api/Dockerfile
+  image: pulse-budget-api
+  restart: unless-stopped
+  environment:
+    DATABASE_URL: postgres://pulse:${POSTGRES_PASSWORD:?Copy .env.example to .env first}@db:5432/pulse
+    APP_TZ: ${APP_TZ:-America/New_York}
+    CURRENCY: ${CURRENCY:-USD}
+    API_TOKEN: ${API_TOKEN:-}
+    DAILY_CRON: ${DAILY_CRON:-0 6 * * *}
+    DIGEST_WEBHOOK_URL: ${DIGEST_WEBHOOK_URL:-}
+    LOG_LEVEL: ${LOG_LEVEL:-info}
+  depends_on:
+    db:
+      condition: service_healthy
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pulse
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env first}
+      POSTGRES_DB: pulse
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U pulse -d pulse]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  api:
+    <<: *app
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 10s
+
+  # Same image as the API. Posts due bills and writes the daily digest on a schedule.
+  worker:
+    <<: *app
+    command: [node, dist/worker.js]
+
+  # The only published port. Serves the dashboard and proxies /api to the API container.
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    image: pulse-budget-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - ${WEB_PORT:-8080}:8080
+    healthcheck:
+      test: [CMD, wget, -q, --spider, http://127.0.0.1:8080/healthz]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+
+volumes:
+  db-data:
